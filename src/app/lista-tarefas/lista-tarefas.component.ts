@@ -19,6 +19,7 @@ export class ListaTarefasComponent implements OnInit {
   validado: boolean = false;
   indexTarefa = -1
   id: number = 0
+  campoBusca: string = ''
 
   formulario: FormGroup = this.fomBuilder.group({
     id: [0],
@@ -40,6 +41,11 @@ export class ListaTarefasComponent implements OnInit {
     });
     return this.listaTarefas;
   }
+  
+  filtrarTarefasPorDescricao(descricao){
+    
+}
+
 
   mostrarOuEsconderFormulario() {
     this.formAberto = !this.formAberto;

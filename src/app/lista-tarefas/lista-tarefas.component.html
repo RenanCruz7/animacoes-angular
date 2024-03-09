@@ -23,7 +23,8 @@
       formControlName="prioridade"
       [ngClass]="campoValidado('prioridade')"
     >
-      <option disabled value="">Selecione</option>
+
+<option disabled value="">Selecione</option>
       <option value="Alta">Alta</option>
       <option value="Normal">Normal</option>
       <option value="Baixa">Baixa</option>
@@ -67,6 +68,16 @@
     <h2>Suas tarefas</h2>
     <img src="assets/imagens/ilustracao-Tarefas.png"
         alt="Ilustração de um ambiente com mesa, computador, quadro e um vaso com planta">
+  </div>
+  <div class="busca">
+    <p class="ff-prompt"> Procurando o que fazer?</p>
+    <input
+    type="search"
+    id="campo-busca"
+    placeholder="Busque por um tarefa"
+    [(ngModel)] = "campoBusca"
+    (keyup)="filtrarTarefasPorDescricao(campoBusca)"
+    >
   </div>
   <div *ngIf="listaTarefas.length > 0, else semTarefas">
     <div
