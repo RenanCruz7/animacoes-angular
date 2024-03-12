@@ -1,4 +1,4 @@
-import { animate, state, style, transition, trigger } from '@angular/animations';
+import { animate, group, keyframes, state, style, transition, trigger } from '@angular/animations';
 
 export const highlightedStateTrigger = trigger("highlistedState", [
   state('default', style({
@@ -39,3 +39,47 @@ export const checkButtonTrigger = trigger('checkButton', [
     }))
   ])
 ])
+
+export const filterTrigger = trigger('filterAnimation', [
+  transition(':enter', [
+    style({opacity: 0, width: 0}),
+    animate('400ms ease-out', keyframes([
+      style({offset: 0, opacity:0, width:0}),
+      style({offset: 0.8, opacity:0.5, width:'*',backgroundColor:'lightgreen'}),
+      style({offset: 1, opacity:1, width:'*',backgroundColor:'lightblue'})
+    ]))
+  ]),
+  transition(':leave', [
+    animate('200ms cubic-bezier(.13,.9,.8,.1)', style({ opacity: 0, width: 0}))
+  ])
+])
+
+export const formButtonTrigger = trigger('formButton', [
+  transition('invalid => valid', [
+    group([
+      animate(100, style({
+        transform: 'scale(1.1)'
+      })),
+      animate(200, style({
+        backgroundColor: '#63B77C'
+      }))
+    ]),
+    animate(200, style({
+      transform: 'scale(1)'
+    }))
+  ]),
+  transition('valid => invalid', [
+    group([
+      animate(100, style({
+        transform: 'scale(1.1)'
+      })),
+      animate(200, style({
+        backgroundColor: '#6C757D'
+      }))
+    ]),
+    animate(200, style({
+      transform: 'scale(1)'
+    }))
+  ])
+])
+

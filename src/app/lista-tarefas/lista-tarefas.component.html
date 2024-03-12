@@ -49,6 +49,7 @@
     </app-mensagem>
     <div class="botoes-form">
       <button
+        [@formButton]="formulario.valid ? 'valid' : 'invalid'"
         (click)="salvarTarefa()"
         class="botao-form"
         [ngClass]="habilitarBotao()"
@@ -79,10 +80,11 @@
     (keyup)="filtrarTarefasPorDescricao(campoBusca)"
     >
   </div>
-  <div *ngIf="listaTarefas.length > 0, else semTarefas">
+  <div *ngIf="tarefasFiltradas.length > 0, else semTarefas">
     <div
+      @filterAnimation
       class="lista-tarefas card-{{ tarefa.categoria }}"
-      *ngFor="let tarefa of listaTarefas; let i = index"
+      *ngFor="let tarefa of tarefasFiltradas; let i = index"
       (mouseover)="indexTarefa = i"
       [@highlistedState] ="indexTarefa === i ? 'highlighted' : 'default'">
       <div class="info-card">
