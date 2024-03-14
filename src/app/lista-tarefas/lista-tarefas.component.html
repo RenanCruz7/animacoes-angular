@@ -4,9 +4,9 @@
       Criar nova tarefa
     </button>
   </div>
-  <form
-    [@formButton]="formulario.valid ? 'valid' : 'invalid'" 
-    @shownState class="formulario ff-prompt"
+  <form @shownState
+    [@formButton]="formulario.valid ? 'valid' : 'invalid'"
+    class="formulario ff-prompt"
     [formGroup]="formulario"
     *ngIf="formAberto">
     <label for="descricao">Descrição da tarefa</label>
@@ -25,8 +25,7 @@
       formControlName="prioridade"
       [ngClass]="campoValidado('prioridade')"
     >
-
-<option disabled value="">Selecione</option>
+      <option disabled value="">Selecione</option>
       <option value="Alta">Alta</option>
       <option value="Normal">Normal</option>
       <option value="Baixa">Baixa</option>
@@ -51,6 +50,7 @@
     </app-mensagem>
     <div class="botoes-form">
       <button
+        id="botao-salvar"
         (click)="salvarTarefa()"
         class="botao-form"
         [ngClass]="habilitarBotao()"
@@ -72,14 +72,13 @@
         alt="Ilustração de um ambiente com mesa, computador, quadro e um vaso com planta">
   </div>
   <div class="busca">
-    <p class="ff-prompt"> Procurando o que fazer?</p>
+    <p class="ff-prompt">Procurando o que fazer?</p>
     <input
-    type="search"
-    id="campo-busca"
-    placeholder="Busque por um tarefa"
-    [(ngModel)] = "campoBusca"
-    (keyup)="filtrarTarefasPorDescricao(campoBusca)"
-    >
+      id="campo-busca" type="search"
+      placeholder="Busque por uma tarefa"
+      [(ngModel)]="campoBusca"
+      (keyup)="filtrarTarefasPorDescricao(campoBusca)"
+  >
   </div>
   <div *ngIf="tarefasFiltradas.length > 0, else semTarefas">
     <div
@@ -87,7 +86,7 @@
       class="lista-tarefas card-{{ tarefa.categoria }}"
       *ngFor="let tarefa of tarefasFiltradas; let i = index"
       (mouseover)="indexTarefa = i"
-      [@highlistedState] ="indexTarefa === i ? 'highlighted' : 'default'">
+      [@highlightedState]="indexTarefa === i ? 'highlighted' : 'default'">
       <div class="info-card">
         <p class="categoria-tarefa categoria-{{ tarefa.categoria }}">
           <img
@@ -101,7 +100,7 @@
         <p class="status-tarefa">
           <button
             [ngClass]="(tarefa.statusFinalizado == true) ? 'icone-checked' : 'icone-unchecked'"
-            (click)="finalizarTarefa(tarefa.id);"
+            (click)="finalizarTarefa(tarefa.id)"
             [@checkButton]="(tarefa.id === id ? 'checked' : 'unchecked')"
             >
           </button>
@@ -132,4 +131,3 @@
 <ng-template #semTarefas>
   <p class="ng-template ff-prompt">Olá! Ainda não há tarefas por aqui! :)</p>
 </ng-template>
-
