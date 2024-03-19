@@ -12,18 +12,18 @@ export class TarefaService {
   private tarefaSubject = new BehaviorSubject<Tarefa[]>([])
   tarefas$ = this.tarefaSubject.asObservable()
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   listar(): void {
     let params = new HttpParams().appendAll({
       _sort: 'id',
       _order: 'desc',
     });
-    this.http.get<Tarefa[]>(this.API, { params }).subscribe((tarefas) => {
-      let tarefasTemporarias = this.tarefaSubject.getValue()
-      tarefasTemporarias = tarefasTemporarias.concat(tarefas)
-      this.tarefaSubject.next(tarefas)
-    });
+    this.http.get<Tarefa[]>(this.API, { params }).subscribe((tarefas) =>{
+      let tarefasTemp = this.tarefaSubject.getValue();
+      tarefasTemp = tarefasTemp.concat(tarefas)
+      this.tarefaSubject.next(tarefasTemp);
+    })
   }
 
   criar(tarefa: Tarefa): void {
@@ -34,25 +34,25 @@ export class TarefaService {
     });
   }
 
-  editar(tarefa: Tarefa): void {
-    const url = `${this.API}/${tarefa.id}`;
-    this.http.put<Tarefa>(url, tarefa).subscribe(tarefaEditada => {
-      const tarefas = this.tarefaSubject.getValue();
-      const index = tarefas.findIndex(tarefa => tarefa.id === tarefaEditada.id);
-      if (index !== -1) {
-        tarefas[index] = tarefaEditada;
-        this.tarefaSubject.next(tarefas);
+  editar(tarefa: Tarefa, atualizarSubject: boolean): void {
+    this.http.put<Tarefa>(`${this.API}/${tarefa.id}`, tarefa).subscribe(tarefaEditada => {
+      if(atualizarSubject){
+        const tarefas = this.tarefaSubject.getValue();
+        const index = tarefas.findIndex(t => t.id === tarefaEditada.id);
+        if (index !== -1) {
+          tarefas[index] = tarefaEditada;
+          this.tarefaSubject.next(tarefas);
+        }
       }
     });
   }
 
   excluir(id: number): void {
-    const url = `${this.API}/${id}`;
-    this.http.delete<Tarefa>(url).subscribe(() => {
+    this.http.delete(`${this.API}/${id}`).subscribe(() => {
       const tarefas = this.tarefaSubject.getValue();
-      const index = tarefas.findIndex(tarefa => tarefa.id === id);
+      const index = tarefas.findIndex(t => t.id === id);
       if (index !== -1) {
-        tarefas.splice(index, 1)
+        tarefas.splice(index, 1);
         this.tarefaSubject.next(tarefas);
       }
     });
@@ -65,6 +65,6 @@ export class TarefaService {
 
   atualizarStatusTarefa(tarefa: Tarefa): void {
     tarefa.statusFinalizado = !tarefa.statusFinalizado;
-    this.editar(tarefa);
+    return this.editar(tarefa, false);
   }
 }
