@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import { Tarefa } from '../interface/tarefa';
 
@@ -9,31 +9,53 @@ import { Tarefa } from '../interface/tarefa';
 })
 export class TarefaService {
   private readonly API = 'http://localhost:3000/tarefas';
-  constructor(private http: HttpClient) {}
+  private tarefaSubject = new BehaviorSubject<Tarefa[]>([])
+  tarefas$ = this.tarefaSubject.asObservable()
 
-  listar(categoria: string): Observable<Tarefa[]> {
+  constructor(private http: HttpClient) { }
+
+  listar(): void {
     let params = new HttpParams().appendAll({
       _sort: 'id',
       _order: 'desc',
     });
-    if (categoria) {
-      params = params.append('categoria', categoria);
-    }
-    return this.http.get<Tarefa[]>(this.API, { params });
+    this.http.get<Tarefa[]>(this.API, { params }).subscribe((tarefas) => {
+      let tarefasTemporarias = this.tarefaSubject.getValue()
+      tarefasTemporarias = tarefasTemporarias.concat(tarefas)
+      this.tarefaSubject.next(tarefas)
+    });
   }
 
-  criar(tarefa: Tarefa): Observable<Tarefa> {
-    return this.http.post<Tarefa>(this.API, tarefa);
+  criar(tarefa: Tarefa): void {
+    this.http.post<Tarefa>(this.API, tarefa).subscribe(novaTarefa => {
+      const tarefas = this.tarefaSubject.getValue();
+      tarefas.unshift(novaTarefa)
+      this.tarefaSubject.next(tarefas);
+    });
   }
 
-  editar(tarefa: Tarefa): Observable<Tarefa> {
+  editar(tarefa: Tarefa): void {
     const url = `${this.API}/${tarefa.id}`;
-    return this.http.put<Tarefa>(url, tarefa);
+    this.http.put<Tarefa>(url, tarefa).subscribe(tarefaEditada => {
+      const tarefas = this.tarefaSubject.getValue();
+      const index = tarefas.findIndex(tarefa => tarefa.id === tarefaEditada.id);
+      if (index !== -1) {
+        tarefas[index] = tarefaEditada;
+        this.tarefaSubject.next(tarefas);
+      }
+    });
   }
 
-  excluir(id: number): Observable<Tarefa> {
+  excluir(id: number): void {
     const url = `${this.API}/${id}`;
-    return this.http.delete<Tarefa>(url);
+    this.http.delete<Tarefa>(url).subscribe(() => {
+      const tarefas = this.tarefaSubject.getValue();
+      const index = tarefas.findIndex(tarefa => tarefa.id === id);
+      if (index !== -1) {
+        tarefas.splice(index, 1)
+        this.tarefaSubject.next(tarefas);
+      }
+    });
   }
 
   buscarPorId(id: number): Observable<Tarefa> {
@@ -41,8 +63,8 @@ export class TarefaService {
     return this.http.get<Tarefa>(url);
   }
 
-  atualizarStatusTarefa(tarefa: Tarefa): Observable<Tarefa> {
+  atualizarStatusTarefa(tarefa: Tarefa): void {
     tarefa.statusFinalizado = !tarefa.statusFinalizado;
-    return this.editar(tarefa);
+    this.editar(tarefa);
   }
 }
